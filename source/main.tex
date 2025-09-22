@@ -103,8 +103,8 @@ Los resultados de \texttt{Year Filter} y \texttt{Hour Filter} alimentan más de 
 Incorpora colas de tipo \textbf{exchange} y \textbf{fan-out (broadcast)}:
 
 \begin{itemize}
-    \item \textbf{Transactions Items Filtered by Year} (exchange): asegura que todas las transacciones de un mismo mes se enruten al mismo worker, asignando meses de manera balanceada entre colas.
-    \item \textbf{Group of Transactions by Month--Year--Qty} (exchange): misma lógica de distribución que la anterior.
+    \item \textbf{Transactions Items Filtered by Year} (exchange): asegura que todas las transacciones de un mismo mes se enruten al mismo worker, asignando meses de manera balanceada entre colas. Como los pares Mes - Año conforman un total de 24 combinaciones, tendremos un total de colas y de pares procesados por worker igual a 24 / N, siendo N la cantidad de workers asignados a esta etapa.
+    \item \textbf{Group of Transactions by Month--Year--Qty} (exchange): misma lógica de distribución que la anterior. Se agrupan las transacciones por año - mes - item y se realiza la suma de cantidades vendidas por producto ademas del subtotal de ganancias generadas.
     \item \textbf{Menu Items} (fan-out): los datos se difunden a todos los \texttt{Menu Item Joiner}. Estos almacenan en memoria la lista de ítems (pocos y estáticos) y luego consumen de la cola \textbf{Items with max profit and qty} (producer--consumer) para realizar los joins.
 \end{itemize}
 
@@ -118,7 +118,7 @@ Incorpora colas de tipo \textbf{exchange} y \textbf{fan-out (broadcast)}:
 Utiliza una cola de tipo \textbf{exchange}:
 
 \begin{itemize}
-    \item \textbf{Transactions Filtered by Hour}: garantiza que todas las entradas de un semestre lleguen al mismo \texttt{Semester Grouper}, que así dispone de la información completa para agregación.
+    \item \textbf{Transactions Filtered by Hour}: garantiza que todas las entradas de un semestre lleguen al mismo \texttt{Semester Grouper}, que así dispone de la información completa para agregación. Como el total de semestres conforman un total de 4 posibilidades, tendremos un total de colas y de semestres procesados por worker igual a 4 / N, siendo N la cantidad de workers asignados a esta etapa.
 \end{itemize}
 
 Además, como en la Consulta 2, los \texttt{Store Id Joiner} reciben por \textbf{fan-out} todos los registros de \textbf{Stores}, los mantienen en memoria y luego consumen de la cola \textbf{Transactions per Semester}.
@@ -135,8 +135,7 @@ Además, como en la Consulta 2, los \texttt{Store Id Joiner} reciben por \textbf
 Requiere dos colas de tipo \textbf{exchange}:
 
 \begin{itemize}
-    \item \textbf{Transactions Filtered by Year}: asegura que todas las transacciones de un mismo \texttt{Store ID} sean procesadas por el mismo worker.
-    \item \textbf{Transactions per Store ID -- User ID}: misma lógica de enrutamiento, manteniendo la coherencia por \texttt{Store ID}.
+    \item \textbf{Transactions Filtered by Year}: asegura que todas las transacciones de un mismo \texttt{Store ID} sean procesadas por el mismo worker. Como el total de stores conforman un total de 10 posibilidades, tendremos un total de colas y de stores procesados por worker igual a 10 / N, siendo N la cantidad de workers asignados a esta etapa.
 \end{itemize}
 
 Al igual que en las queries anteriores, las colas de tipo \textbf{fan-out} se cargan en memoria antes de iniciar el procesamiento principal.
@@ -195,7 +194,7 @@ Se muestran los distintos modulos a implementar:
 \end{figure}
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{general.png}
+    \includegraphics[width=1.4\textwidth, angle=90]{general.png}
     \caption{Vista general de los paquetes, incluyendo la comunicación entre estos.}
 \end{figure}
 
