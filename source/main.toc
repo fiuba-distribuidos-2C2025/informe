@@ -5,17 +5,17 @@
 \contentsline {section}{\numberline {2}Arquitectura}{2}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Vista Física}{2}{subsection.2.1}%
 \contentsline {paragraph}{Se muestra la enteridad del sistema y las conexiones existentes entre las diversas entidades del sistema.}{2}{section*.4}%
-\contentsline {subsubsection}{\numberline {2.1.1}Diagrama de Robustez}{3}{subsubsection.2.1.1}%
-\contentsline {paragraph}{Se visualizan todos los componentes que interactuan en nuestro diseño, desde la interacción inicial del cliente, hasta la finalización del procesado de todas las consultas.}{4}{section*.5}%
-\contentsline {subsubsection}{\numberline {2.1.2}Diagrama de Despliegue}{6}{subsubsection.2.1.2}%
-\contentsline {subsection}{\numberline {2.2}Vista Lógica}{7}{subsection.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.1}DAG}{7}{subsubsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.3}Vista de Desarrollo}{7}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {2.3.1}Diagrama de Paquetes}{7}{subsubsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.4}Vista de Procesos}{9}{subsection.2.4}%
-\contentsline {paragraph}{Se representa la interacción entre los componentes del sistema, su forma de comunicación de principio a fin. Es posible visualizar la concurrencia del sistema, asi como también la escalabilidad y distribuición de tareas.}{9}{section*.10}%
-\contentsline {subsubsection}{\numberline {2.4.1}Diagrama de Actividad}{11}{subsubsection.2.4.1}%
-\contentsline {paragraph}{Se muestra el parcialmente el proceso de obtener los productos más vendidos y que más ganancias han generado, para cada mes, en este caso se representa solamente la parte de mayor complejidad* de obtención, la de mayor valor y no solo mayor cantidad de ventas.}{11}{section*.11}%
-\contentsline {paragraph}{*Se considera más complejo debido a que los pasos necesarios para obtener este dato es superior a la de calcular el producto más vendido en cantidad.}{11}{section*.12}%
-\contentsline {subsubsection}{\numberline {2.4.2}Diagrama de Secuencia}{12}{subsubsection.2.4.2}%
-\contentsline {paragraph}{Podemos ver como el cliente desde la terminal inicializa el programa, el cual establece conexión con el sistema mediante el Request Handler. La comunicación entre ellos consistira en enviar todos los datos necesarios en bucle, cada mensaje transmitido por el cliente incluye un header informando el tipo de archivo transmitido, el tamaño del payload, y un bit que indica si hay datos pendientes por transmitir posteriores a ese mensaje. Una vez que ya no haya nada más que enviar, el Middleware le enviará el programa el resultado final, el cual sera mostrado por terminal al usuario.}{12}{section*.13}%
+\contentsline {subsubsection}{\numberline {2.1.1}Diagrama de Robustez}{2}{subsubsection.2.1.1}%
+\contentsline {paragraph}{Se visualizan todos los componentes que interactuan en nuestro diseño, desde la interacción inicial del cliente, hasta la finalización del procesado de todas las consultas.}{2}{section*.5}%
+\contentsline {subsubsection}{\numberline {2.1.2}Diagrama de Despliegue}{4}{subsubsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.2}Vista Lógica}{6}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}DAG}{6}{subsubsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.3}Vista de Desarrollo}{6}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}Diagrama de Paquetes}{6}{subsubsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.4}Vista de Procesos}{8}{subsection.2.4}%
+\contentsline {paragraph}{Se representa la interacción entre los componentes del sistema, su forma de comunicación de principio a fin. Es posible visualizar la concurrencia del sistema, asi como también la escalabilidad y distribuición de tareas.}{8}{section*.10}%
+\contentsline {subsubsection}{\numberline {2.4.1}Diagrama de Actividad}{9}{subsubsection.2.4.1}%
+\contentsline {paragraph}{Se muestra el parcialmente el proceso de obtener los productos más vendidos y que más ganancias han generado, para cada mes, en este caso se representa solamente la parte de mayor complejidad* de obtención, la de mayor valor y no solo mayor cantidad de ventas.}{9}{section*.11}%
+\contentsline {paragraph}{*Se considera más complejo debido a que los pasos necesarios para obtener este dato es superior a la de calcular el producto más vendido en cantidad.}{9}{section*.12}%
+\contentsline {subsubsection}{\numberline {2.4.2}Diagrama de Secuencia}{10}{subsubsection.2.4.2}%
+\contentsline {paragraph}{Podemos ver como el cliente desde la terminal inicializa el programa, el cual establece conexión con el sistema mediante el Request Handler. La comunicación entre ellos consistira en enviar todos los datos necesarios en bucle, cada mensaje transmitido por el cliente incluye un header informando el tipo de archivo transmitido, el tamaño del payload, y un bit que indica si hay datos pendientes por transmitir posteriores a ese mensaje. Una vez que ya no haya nada más que enviar, el Middleware le enviará el programa el resultado final, el cual sera mostrado por terminal al usuario.}{10}{section*.13}%
