@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.22)  2 OCT 2025 20:14
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.22)  13 OCT 2025 02:25
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -357,24 +357,19 @@ File: multiple_computo.png Graphic file (type png)
 <use multiple_computo.png>
 Package pdftex.def Info: multiple_computo.png  used on input line 78.
 (pdftex.def)             Requested size: 75.53058pt x 76.9412pt.
-<robustez.png, id=46, 1903.11pt x 672.5125pt>
-File: robustez.png Graphic file (type png)
-<use robustez.png>
-Package pdftex.def Info: robustez.png  used on input line 83.
-(pdftex.def)             Requested size: 503.55777pt x 177.9379pt.
 
 
-[2 <./colas.png> <./multiple_computo.png> <./robustez.png>]
-<consulta1.png, id=63, 1256.695pt x 177.66376pt>
+[2 <./colas.png> <./multiple_computo.png>]
+<consulta1.png, id=61, 1423.3175pt x 100.375pt>
 File: consulta1.png Graphic file (type png)
 <use consulta1.png>
-Package pdftex.def Info: consulta1.png  used on input line 102.
-(pdftex.def)             Requested size: 503.55777pt x 71.18893pt.
-<consulta2.png, id=64, 1341.01pt x 329.23pt>
+Package pdftex.def Info: consulta1.png  used on input line 98.
+(pdftex.def)             Requested size: 503.55777pt x 35.5116pt.
+<consulta2.png, id=62, 1640.1275pt x 344.28625pt>
 File: consulta2.png Graphic file (type png)
 <use consulta2.png>
-Package pdftex.def Info: consulta2.png  used on input line 117.
-(pdftex.def)             Requested size: 503.55777pt x 123.62672pt.
+Package pdftex.def Info: consulta2.png  used on input line 115.
+(pdftex.def)             Requested size: 503.55777pt x 105.70322pt.
 
 
 [3
@@ -382,112 +377,112 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.126     \item \textbf
-                       {Stores} (fan-out): los datos se difunden a todos los...
+                       {Transactions with tpv}: Estas colas contienen las tr...
 pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.126     \item \textbf
-                       {Stores} (fan-out): los datos se difunden a todos los... <./consulta1.png> <./consulta2.png>]
-<consulta3.png, id=77, 957.5775pt x 274.02374pt>
+                       {Transactions with tpv}: Estas colas contienen las tr... <./consulta1.png> <./consulta2.png>]
+<consulta3.png, id=82, 1913.1475pt x 305.14pt>
 File: consulta3.png Graphic file (type png)
 <use consulta3.png>
 Package pdftex.def Info: consulta3.png  used on input line 131.
-(pdftex.def)             Requested size: 503.55777pt x 144.09877pt.
-<consulta4.png, id=78, 1118.1775pt x 394.47375pt>
+(pdftex.def)             Requested size: 503.55777pt x 80.31229pt.
+<consulta4.png, id=83, 2037.6125pt x 394.47375pt>
 File: consulta4.png Graphic file (type png)
 <use consulta4.png>
-Package pdftex.def Info: consulta4.png  used on input line 146.
-(pdftex.def)             Requested size: 503.55777pt x 177.64397pt.
-<despliegue.png, id=79, 4826.03pt x 3416.765pt>
+Package pdftex.def Info: consulta4.png  used on input line 150.
+(pdftex.def)             Requested size: 503.55777pt x 97.48659pt.
+<despliegue.png, id=84, 1075.01625pt x 834.11626pt>
 File: despliegue.png Graphic file (type png)
 <use despliegue.png>
-Package pdftex.def Info: despliegue.png  used on input line 156.
-(pdftex.def)             Requested size: 503.55777pt x 356.50302pt.
+Package pdftex.def Info: despliegue.png  used on input line 161.
+(pdftex.def)             Requested size: 503.55777pt x 390.71103pt.
 
 
 [4
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.158 
+l.163 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.158 
+l.163 
        <./consulta3.png> <./consulta4.png>]
-<DAG.png, id=89, 1596.96625pt x 1315.91624pt>
+<DAG.png, id=96, 1597.97pt x 1315.91624pt>
 File: DAG.png Graphic file (type png)
 <use DAG.png>
-Package pdftex.def Info: DAG.png  used on input line 164.
-(pdftex.def)             Requested size: 503.55777pt x 414.93747pt.
+Package pdftex.def Info: DAG.png  used on input line 169.
+(pdftex.def)             Requested size: 503.55777pt x 414.67645pt.
 
 
 [5 <./despliegue.png>]
-<cliente.png, id=95, 3216.015pt x 1770.615pt>
-File: cliente.png Graphic file (type png)
-<use cliente.png>
-Package pdftex.def Info: cliente.png  used on input line 177.
-(pdftex.def)             Requested size: 503.55777pt x 277.22528pt.
-<worker.png, id=96, 3216.015pt x 1770.615pt>
-File: worker.png Graphic file (type png)
-<use worker.png>
-Package pdftex.def Info: worker.png  used on input line 182.
-(pdftex.def)             Requested size: 503.55777pt x 277.22528pt.
+Underfull \hbox (badness 10000) in paragraph at lines 179--180
+
+ []
+
+<paquete-client.png, id=102, 783.92876pt x 402.50375pt>
+File: paquete-client.png Graphic file (type png)
+<use paquete-client.png>
+Package pdftex.def Info: paquete-client.png  used on input line 184.
+(pdftex.def)             Requested size: 402.84775pt x 206.84033pt.
 
 
 [6 <./DAG.png>]
-<request_controller.png, id=103, 3216.015pt x 1770.615pt>
-File: request_controller.png Graphic file (type png)
-<use request_controller.png>
-Package pdftex.def Info: request_controller.png  used on input line 188.
-(pdftex.def)             Requested size: 503.55777pt x 277.22528pt.
+<paquete-worker.png, id=109, 793.96625pt x 653.44125pt>
+File: paquete-worker.png Graphic file (type png)
+<use paquete-worker.png>
+Package pdftex.def Info: paquete-worker.png  used on input line 191.
+(pdftex.def)             Requested size: 402.84775pt x 331.5556pt.
+<paquete-rh.png, id=110, 633.36626pt x 332.24126pt>
+File: paquete-rh.png Graphic file (type png)
+<use paquete-rh.png>
+Package pdftex.def Info: paquete-rh.png  used on input line 197.
+(pdftex.def)             Requested size: 402.84775pt x 211.32571pt.
 
 
-[7
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.191 
-      
-pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.191 
-       <./cliente.png> <./worker.png>]
-<middleware.png, id=112, 1533.73pt x 1569.865pt>
-File: middleware.png Graphic file (type png)
-<use middleware.png>
-Package pdftex.def Info: middleware.png  used on input line 194.
-(pdftex.def)             Requested size: 226.59946pt x 231.92438pt.
-<actividad.png, id=113, 4420.515pt x 4460.665pt>
-File: actividad.png Graphic file (type png)
-<use actividad.png>
-Package pdftex.def Info: actividad.png  used on input line 205.
-(pdftex.def)             Requested size: 503.55777pt x 508.0991pt.
+[7 <./paquete-client.png> <./paquete-worker.png>]
+<paquete-middleware.png, id=117, 362.35374pt x 402.50375pt>
+File: paquete-middleware.png Graphic file (type png)
+<use paquete-middleware.png>
+Package pdftex.def Info: paquete-middleware.png  used on input line 203.
+(pdftex.def)             Requested size: 402.84775pt x 447.49074pt.
+<paquete-rb.png, id=118, 638.385pt x 332.24126pt>
+File: paquete-rb.png Graphic file (type png)
+<use paquete-rb.png>
+Package pdftex.def Info: paquete-rb.png  used on input line 209.
+(pdftex.def)             Requested size: 402.84775pt x 209.65782pt.
 
 
-[8
-pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.207 \paragraph
-                {Se muestra el parcialmente el proceso de obtener los produc...
-pdfTeX warning (ext4): destination with the same identifier (name{figure.8}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.207 \paragraph
-                {Se muestra el parcialmente el proceso de obtener los produc... <./request_controller.png> <./middleware.png>]
-<secuencia.png, id=123, 3589.41pt x 2505.36pt>
+[8 <./paquete-rh.png> <./paquete-middleware.png>]
+<actividades.png, id=125, 1085.05376pt x 1095.09125pt>
+File: actividades.png Graphic file (type png)
+<use actividades.png>
+Package pdftex.def Info: actividades.png  used on input line 221.
+(pdftex.def)             Requested size: 503.55777pt x 508.20958pt.
+
+
+[9 <./paquete-rb.png>]
+<actividades-eof.png, id=133, 1586.92876pt x 633.36626pt>
+File: actividades-eof.png Graphic file (type png)
+<use actividades-eof.png>
+Package pdftex.def Info: actividades-eof.png  used on input line 230.
+(pdftex.def)             Requested size: 503.55777pt x 200.97075pt.
+
+
+[10 <./actividades.png>]
+<secuencia.png, id=143, 3589.41pt x 2505.36pt>
 File: secuencia.png Graphic file (type png)
 <use secuencia.png>
-Package pdftex.def Info: secuencia.png  used on input line 215.
-(pdftex.def)             Requested size: 503.55777pt x 351.47435pt.
+Package pdftex.def Info: secuencia.png  used on input line 238.
+(pdftex.def)             Requested size: 402.84775pt x 281.17184pt.
 
 
-[9 <./actividad.png>]
+[11 <./actividades-eof.png> <./secuencia.png>]
 
-[10 <./secuencia.png>] (./main.aux
+[12] (./main.aux
 LaTeX Info: Redefining \. on input line 12.
 LaTeX Info: Redefining \% on input line 12.
 )
@@ -497,18 +492,18 @@ L3 programming layer <2025-01-18>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 11555 strings out of 473190
- 183107 string characters out of 5715800
- 594696 words of memory out of 5000000
- 34636 multiletter control sequences out of 15000+600000
+ 11578 strings out of 473190
+ 183568 string characters out of 5715800
+ 596702 words of memory out of 5000000
+ 34647 multiletter control sequences out of 15000+600000
  566231 words of font info for 48 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,12n,79p,752b,531s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx2488.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on main.pdf (11 pages, 1798888 bytes).
+ 75i,12n,79p,1070b,554s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx2488.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
+Output written on main.pdf (13 pages, 1053870 bytes).
 PDF statistics:
- 219 PDF objects out of 1000 (max. 8388607)
- 159 compressed objects within 2 object streams
- 48 named destinations out of 1000 (max. 500000)
- 177 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 252 PDF objects out of 1000 (max. 8388607)
+ 184 compressed objects within 2 object streams
+ 60 named destinations out of 1000 (max. 500000)
+ 182 words of extra memory for PDF output out of 10000 (max. 10000000)
 

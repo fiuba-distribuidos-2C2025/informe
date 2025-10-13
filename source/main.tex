@@ -78,14 +78,10 @@ transacciones realizadas entre las 06:00 AM y las 11:00 PM.
     \includegraphics[width=0.15\linewidth]{multiple_computo.png}
 \end{figure}
 \end{itemize}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1.0\textwidth]{robustez.png}
-\end{figure}
 
 Cada worker tiene asociado una cola de input y una cola de output, salvo los aggregators que obtienen resultados de muchos workers en una unica cola y se encargan de agregar los resultados.
 
-Las colas marcadas como tipo "broadcast" se basan en multiples colas cada una de ellas conectadas a un worker de salida, el worker que se encarga de producir en esta cola iterara cada una de ellas dejando el mismo dato en todas ellas.
+Las colas marcadas como tipo "broadcast" se basan en multiples colas producer-consumer, cada una de ellas conectadas a un worker de salida, el worker que se encarga de producir en esta cola iterara cada una de ellas dejando el mismo dato en todas, de esa forma cada worker de salida recibira el mismo mensaje y podra procesarlo de manera independiente. Usualmente usado para joiners.
 
 Por otro lado el manejo de EOF (end of file) se realiza mediante un mensaje especial que indica a los workers que no habra mas datos a procesar. El request handler encola ese mensaje en todas las colas de entrada y los sucesivos workers iran propagando el mensaje de EOF a medida que terminan su trabajo, una vez que todos los EOF correspondientes lleguen a las colas de resultados entonces el Response Builder arma la respuesta y la envia al cliente indicando que una query ya fue completamente procesada
 
@@ -95,7 +91,7 @@ A continuación, se muestran cuatro extractos del diagrama de robustez, destacan
 
 \subsection*{Consulta 1}
 Es la más simple. Requiere tres filtros encadenados (\textbf{Year Filter}, \textbf{Hour Filter} y \textbf{Amount Filter}).  
-Cada etapa puede escalarse mediante un esquema \textbf{producer--consumer}: los workers consumen mensajes de la cola, procesan la entrada y deciden si reenviarla o descartarla.
+Cada etapa puede escalarse mediante un esquema \textbf{producer--consumer}: los workers consumen mensajes de la cola, procesan la entrada y deciden si reenviarla a la cola de salidao descartarla.
 
 \begin{figure}[H]
     \centering
@@ -105,12 +101,14 @@ Cada etapa puede escalarse mediante un esquema \textbf{producer--consumer}: los 
 
 
 \subsection*{Consulta 2}
-Incorpora las colas de tipo \textbf{fan-out (broadcast)} para mandar un mismo mensaje a multiples workers:
-
-\begin{itemize}
-    \item \textbf{Transactions with profit and total amount}: En este caso contenemos una unica cola que va a tener todos los resultados parciales de nuestro groupers segun la data que pudieron obtener de la cola anterior, en este caso el mas profit and quantity filter sera el encargado de no solo filtrar los resultados si no tambien agregarlos para tener los resultados finales
-    \item \textbf{Menu Items} (fan-out): los datos se difunden a todos los \texttt{Menu Item Joiner}. Estos almacenan en memoria la lista de ítems (pocos y estáticos) y luego consumen de la cola \textbf{Items with max profit and qty} (producer--consumer) para realizar los joins. Como el total de items del menú siempre son 8 entonces podemos cargarlos en memoria sin problemas.
-\end{itemize}
+Ya que al final es necesario hacer un join de dos datasets distintos, el joiner final procesara y guardara todos los datos de \texttt{Menu Items} antes de comenzar a procesar los datos de \texttt{Transactions profit and quantity}, ya que estos tardaran mucho mas en llegar.
+\begin{enumerate}
+    \item \textbf{Menu Items}: los datos se difunden a todos los \texttt{Item Id Joiner}. Estos almacenan en memoria la lista de ítems (pocos y estáticos) y luego consumen de la cola \textbf{Items with max values} (producer--consumer) para realizar los joins. Como el total de items del menú siempre son 8 entonces podemos cargarlos en memoria sin problemas. \newline
+    \textbf{Transactions Items}: Estas colas obtienen los datos directo del request handler que es lo que recibe los datasets del cliente, no hay ningun pre-proceso previo asi que estos datos representan filas del dataset original.
+    \item \textbf{Transactions 2024-2025}: Estas colas contienen las transacciones filtradas por año, ademas cada worker elimina las columnas que no van a ser necesarias en los proximos pasos de la query.
+    \item \textbf{Transactions profit and quantity}: En este caso contenemos una unica cola que va a tener todos los resultados parciales de nuestros groupers segun la data que pudieron obtener de la cola anterior, en este caso el profit and quantity aggregator sera el encargado de agregar los resultados parciales de los groupers para tener los resultados finales
+    \item \textbf{Items with max values}: Estas colas contienen las transacciones el resultado de agrupar todas las transacciones por mes con el profit y el quantity.
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -119,12 +117,14 @@ Incorpora las colas de tipo \textbf{fan-out (broadcast)} para mandar un mismo me
 \end{figure}
 
 \subsection*{Consulta 3}
-Utiliza una cola de tipo \textbf{broadcast}:
-
-\begin{itemize}
-    \item \textbf{Transactions per semester}: Siguiendo la logica anterior tenemos un único aggregator que se encarga de obtener los datos parciales de los groupers y los agrega en un solo resultado final, el cual sera enviado a la cola de \textbf{Transactions grouped}.
-    \item \textbf{Stores} (fan-out): los datos se difunden a todos los \texttt{Store ID Joiner}. Estos almacenan en memoria la lista de ítems (pocos y estáticos) y luego consumen de la cola \textbf{Transactions grouped} (producer--consumer) para realizar los joins. Como el total de items del menú siempre son 10 entonces podemos cargarlos en memoria sin problemas.
-\end{itemize}
+\begin{enumerate}
+    \item \textbf{Stores\_3}: Estos datos se difunden a todos los \texttt{Store ID Joiner} y contienen todos los registros de las tiendas. Estos almacenan en memoria la lista de ítems (pocos y estáticos) y luego consumen de la cola \textbf{Transactions per semester} (producer--consumer) para realizar los joins. Como el total de items del menú siempre son 10 entonces podemos cargarlos en memoria sin problemas. En este caso tiene el sufijo \_3 para diferenciarlo de las colas de la consulta 4.\newline
+    \textbf{Transactions}: Estas colas contienen las transacciones originales sin ningun pre-proceso previo asi que estos datos representan filas del dataset original.
+    \item \textbf{Transactions 2024-2025}: Estas colas contienen las transacciones filtradas por año, ademas cada worker elimina las columnas que no van a ser necesarias en los proximos pasos de la query.
+    \item \textbf{Transactions 6 AM - 11 PM}: Estas colas contienen las transacciones filtradas por hora, ademas cada worker elimina las columnas que no van a ser necesarias en los proximos pasos de la query.
+    \item \textbf{Transactions per semester}: Siguiendo la logica anterior tenemos un único aggregator que se encarga de obtener los datos parciales de los groupers y los agrega en un solo resultado final, el cual sera enviado a la cola de \textbf{Transactions with tpv}.
+    \item \textbf{Transactions with tpv}: Estas colas contienen las transacciones ya agrupadas con el TPV calculado, listas para ser unidas con los datos de las sucursales.
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -133,11 +133,15 @@ Utiliza una cola de tipo \textbf{broadcast}:
 \end{figure}
 
 \subsection*{Consulta 4}
-Requiere dos colas de tipo \textbf{broadcast}:
-
 \begin{itemize}
-    \item \textbf{Transactions per Store ID - User ID}: Al igual que en los casos anteriores, tenemos un agregator que recibe los datos parciales de los groupers y los agrega en un solo resultado final, el cual sera enviado a la cola de \textbf{Top 3 transactions per store}.
-    \item \textbf{Top 3 transactions per store}: Estas colas se comportan como si fuera un fan-out exchange donde todos los resultados llegan a todos los workers, ya que estos resultados nunca son muy grandes (solo 3 resultados por cada sucursal) y al tenerlo en memoria, los workers pueden realizar los joins de manera correcta.
+    \item \textbf{Stores\_4}: Estos datos se difunden a todos los \texttt{Store ID Joiner} y contienen todos los registros de las tiendas. Estos almacenan en memoria la lista de ítems (pocos y estáticos) y luego consumen de la cola \textbf{Transactions per semester} (producer--consumer) para realizar los joins. Como el total de items del menú siempre son 10 entonces podemos cargarlos en memoria sin problemas. En este caso tiene el sufijo \_4 para diferenciarlo de las colas de la consulta 3.\newline
+    \textbf{Transactions}: Estas colas contienen las transacciones originales sin ningun pre-proceso previo asi que estos datos representan filas del dataset original.
+    \textbf{Users}: Estas colas contienen los datos de los usuarios de las cafeterias, los cuales son pocos y estaticos, por lo que cada worker puede cargar todos los datos en memoria y realizar los joins de manera correcta.
+    \item \textbf{Transactions 2024-2025}: Estas colas contienen las transacciones filtradas por año, ademas cada worker elimina las columnas que no van a ser necesarias en los proximos pasos de la query.
+    \item \textbf{Transactions 6 AM - 11 PM}: Estas colas contienen las transacciones filtradas por hora, ademas cada worker elimina las columnas que no van a ser necesarias en los proximos pasos de la query.
+    \item \textbf{Transactions with user and store}: Al igual que en los casos anteriores, tenemos un agregator que recibe los datos parciales de los groupers y los agrega en un solo resultado final, el cual sera enviado a la cola de \textbf{Top 3 transactions per store}.
+    \item \textbf{Top 3 transactions per store}: Estas colas se comportan como si fuera un fan-out donde todos los resultados llegan a todos los workers, ya que estos resultados nunca son muy grandes (solo 3 resultados por cada sucursal) y al tenerlo en memoria, los workers pueden realizar los joins de manera correcta.
+    \item \textbf{Top 3 transactions with birthday}: Estas colas contienen los resultados finales de la consulta, con los 3 clientes que más compras han hecho en cada sucursal, junto con su fecha de cumpleaños.
 \end{itemize}
 
 
@@ -150,6 +154,7 @@ Requiere dos colas de tipo \textbf{broadcast}:
 \subsubsection{Diagrama de Despliegue}
 
 Podemos ver como los toda comunicación interna es realizada mediante RabbitMQ (el middleware).
+En este caso se agrupan los workers por tipo en un mismo nodo de computo.
 
 \begin{figure}[H]
     \centering
@@ -168,31 +173,40 @@ Los aggregators son los nodos encargados de obtener data de los groupers y acumu
 
 
 \subsection{Vista de Desarrollo}
-Aquí podemos visualizar como esta planeada la arquitectura del sistema desde la perspectiva del código. Se divide el sistema en distintos modulos para Cliente, Worker, Request Controller, Response builder y Middleware.
+Aquí podemos visualizar como esta planeada la arquitectura del sistema desde la perspectiva del código. Se divide el sistema en distintos modulos para Client, Worker, Request Handler, Response builder y Middleware.
 
 \subsubsection{Diagrama de Paquetes}
-Se muestran los distintos modulos a implementar:
+Se muestran los distintos modulos a implementar:\newline
+
+El cliente tiene la responsabilidad de comunicarse con el Request handler para enviarle toda la data necesaria para procesar las 4 queries. Tiene como entrypoint un modulo main que se encarga de parsear la configuracion y comenzar la comunicacion llamando al modulo client. El serializer es un modulo con algunas funciones auxiliares que sirven para serializar y deserializar los paquetes a mandar
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{cliente.png}
-    \caption{El cliente tiene la responsabilidad de comunicarse con el Request controller, siguiendo los parametros especificados en su configuración.}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{worker.png}
-    \caption{Los workers tienen la tarea de filtrar, acumular o agrupar los diversos tipos de datos que lean de las colas a las que estes subscriptos.}
+    \includegraphics[width=0.8\linewidth]{paquete-client.png}
 \end{figure}
 
+Los workers tienen la tarea de filtrar, acumular o agrupar los diversos tipos de datos que lean de las colas a las que estes subscriptos. En este caso todos los tipos de workers comparten el mismo modulo main donde se parsea la configuracion y se inicializa el worker llamando al modulo worker, dicho modulo tiene la logica comun a todos los tipos de workers, como la conexion a RabbitMQ y el manejo de colas segun esten configuradas. Este modulo luego llamara a los modulos correspondientes segun el tipo de worker que sea donde ya se implemenara la lógica especifica para cada uno de ellos.
+Para simplificacion del gráfico no se muestran todos los tipos de workers pero existe un modulo distinto para cada uno de ellos dentro de su respectivo paquete.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{request_controller.png}
-    \caption{La tarea del request controller es interpretar los mensajes del cliente, para poder derivarlos a las diferentes colas de RabbitMQ.}
+    \includegraphics[width=0.8\linewidth]{paquete-worker.png}
 \end{figure}
 
+La tarea del request handler es interpretar los mensajes del cliente, para poder derivarlos a las diferentes colas de RabbitMQ. Tiene un modulo main que se encarga de parsear la configuracion y comenzar la comunicacion llamando al modulo request handler, el cual tiene la logica para interpretar los mensajes del cliente y enviarlos a las colas correspondientes para empezar el trabajo.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\linewidth]{middleware.png}
-    \caption{El Middleware tiene un manejo de cola y cliente, asi como también las librerias necesarias para el interfazado con RabbitMQ}
+    \includegraphics[width=0.8\linewidth]{paquete-rh.png}
+\end{figure}
+
+El Middleware es el que se encarga principalmente de la interaccion con la libreria de RabbitMQ. Contiene un modulo con la interfaz (provista a traves del enunciado). La implementacion de dicha interfaz se encuentra en el modulo middleware, el cual tiene la logica para conectarse a RabbitMQ, encolar y desencolar mensajes. El modulo de utils contiene funciones auxiliares utilizadas por el modulo middleware.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{paquete-middleware.png}
+\end{figure}
+
+El response builder tiene la responsabilidad de procesar los resultados parciales de cada query que van llegando de los ultimos workers y armar la respuesta final para enviarsela al request handler, quien luego se encargara de enviarla al cliente. Tiene un modulo main que se encarga de parsear la configuracion y comenzar la comunicacion llamando al modulo response builder, el cual tiene la logica para leer los resultados parciales de las colas correspondientes y armar la respuesta final.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{paquete-rb.png}
 \end{figure}
 
 \subsection{Vista de Procesos}
@@ -200,19 +214,28 @@ Se muestran los distintos modulos a implementar:
 \paragraph{Se representa la interacción entre los componentes del sistema, su forma de comunicación de principio a fin. Es posible visualizar la concurrencia del sistema, asi como también la escalabilidad y distribuición de tareas.}
 
 \subsubsection{Diagrama de Actividad}
+\paragraph{En el siguiente diagrama se muestra parcialmente el proceso de obtener los productos más vendidos y que más ganancias han generado, para cada mes, en este caso se representa solamente la parte de mayor complejidad de obtención, la de mayor valor y no solo mayor cantidad de ventas.}
+\paragraph{*Se considera más complejo debido a que los pasos necesarios para obtener este dato es superior a la de calcular el producto más vendido en cantidad.}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{actividad.png}
+    \includegraphics[width=1\linewidth]{actividades.png}
 \end{figure}
-\paragraph{Se muestra el parcialmente el proceso de obtener los productos más vendidos y que más ganancias han generado, para cada mes, en este caso se representa solamente la parte de mayor complejidad* de obtención, la de mayor valor y no solo mayor cantidad de ventas.}
+\paragraph{El proceso que observamos en el diagrama comienza con los groupers, en este caso estos tomaran la data de diferentes colas de entrada donde tienen transacciones e iran sumando los valores correspondiente a un item del menu en un mismo año y mes, para luego enviar sus resultados a la cola de salida para que el aggregator los pueda procesar}
+\paragraph{El aggregator se encargara de recibir todos los resultados parciales de los groupers y sumarlos en un solo resultado final para cada año-mes. Este sera enviado a la cola de salida para que el joiner del menu de items pueda agregar el nombre del item a los resultados}
+\paragraph{El joiner del menu de items en un principio espera a obtener los datos del dataset de menu items ya que sin estos no podra realizar el join, una vez los tiene se queda esperando por el resultado del aggregator. Une vez recibidos los resultados finales del aggregator y realizar el join con los datos correctos envia dicha fila de resultado a la cola de resultados que va a ser leida por el response builder }
 
-\paragraph{*Se considera más complejo debido a que los pasos necesarios para obtener este dato es superior a la de calcular el producto más vendido en cantidad.}
+\paragraph{Manejo de EOF:}En el siguiente diagrama se muestra como se maneja el EOF desde que comienza una query hasta que termina para determinar cuando los workers dejan de esperar por datos y dejan de leer una cola. Para simplificar el diagrama se muestran solo algunos filtros del total ya que el proceso es el mismo para todos.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{actividades-eof.png}
+\end{figure}
+\paragraph{Este proceso se da como en una especie de cascada. En primer lugar el cliente enviara datos indicando que tipo de dataset esta enviando \(transactions, menu_items, etc.\) mandando un EOF cuando ya envio todos los datos relacionados a un tipo especifico. El request handler detectara este mensaje de EOF y encolara un nuevo mensaje EOF en las colas de salida correspondientes. Asi se dara el proceso donde cada vez que un worker lee un mensaje de EOF debe propagarlo hacia la cola de salida sea cual sea, asi se asegura de que el proximo worker tambien lo recibe. Una vez llega al ultimo worker de la query este encola el resultado final indicando tambien que ha terminado de procesar todos los datos. El response builder espera a recibir todos los EOFs de todos los workers de salida para saber que ya tiene la totalidad de la respuesta para la query entonces puede procesarla y enviarla al request handler.}
 
 \subsubsection{Diagrama de Secuencia}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{secuencia.png}
+    \includegraphics[width=0.8\linewidth]{secuencia.png}
 \end{figure}
 \paragraph{Podemos ver como el cliente desde la terminal inicializa el programa, el cual establece conexión con el sistema mediante el Request Handler. La comunicación entre ellos consistira en enviar todos los datos necesarios en bucle, cada mensaje transmitido por el cliente incluye un header informando el tipo de archivo transmitido, el tamaño del payload, y un bit que indica si hay datos pendientes por transmitir posteriores a ese mensaje. Una vez que ya no haya nada más que enviar, el Middleware le enviará el programa el resultado final, el cual sera mostrado por terminal al usuario.}
 \end{document}
