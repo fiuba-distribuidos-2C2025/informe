@@ -10,6 +10,10 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage[margin=0.65in]{geometry}
+\usepackage[spanish]{babel}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{longtable}
 
 \pagestyle{fancy} % Encabezado y pie de página
 \fancyhf{}
@@ -169,7 +173,7 @@ En este caso se agrupan los workers por tipo en un mismo nodo de computo.
     \includegraphics[width=1\linewidth]{DAG.png}
 \end{figure}
 Se visualiza un directed acyclic graph que muestra el flujo de datos siendo atravezado por los distintos componentes, comenzando de arriba hacia abajo. Los trabajadores (workers) se dividen en agrupadores (groupers), acumuladores (joiners), agregadores (aggregators) y filtradores (filters). Las fuentes de información inicial, y donde se almacena finalmente lo procesado son a nivel de implementación colas.
-Los aggregators son los nodos encargados de obtener data de los groupers y acumularla en un solo resultado final segun sea necesario, de esta manera los groupers pueden recibir cualquier tipo de data y agrupar en base a los datos que le lleguen.
+Los aggregators son los nodos encargados de obtener data de los groupers y acumularla en un solo resultado final segun sea necesario, de esta manera los groupers pueden recibir cualquier tipo de data y agrupar en ba\textbf{}se a los datos que le lleguen.
 
 
 \subsection{Vista de Desarrollo}
@@ -238,4 +242,146 @@ El response builder tiene la responsabilidad de procesar los resultados parciale
     \includegraphics[width=0.8\linewidth]{secuencia.png}
 \end{figure}
 \paragraph{Podemos ver como el cliente desde la terminal inicializa el programa, el cual establece conexión con el sistema mediante el Request Handler. La comunicación entre ellos consistira en enviar todos los datos necesarios en bucle, cada mensaje transmitido por el cliente incluye un header informando el tipo de archivo transmitido, el tamaño del payload, y un bit que indica si hay datos pendientes por transmitir posteriores a ese mensaje. Una vez que ya no haya nada más que enviar, el Middleware le enviará el programa el resultado final, el cual sera mostrado por terminal al usuario.}
+
+\section{Comunicacion}\label{sec:comunicacion}
+
+\subsection{Vista general}
+\paragraph{Se describe el protocolo de comunicación utilizado entre el client y request_handler para la transferencia de archivos CSV y la obtención de resultados. El protocolo utiliza framing de tipo TLV (type-lenght-value) para prevenir short reads/writes.}
+
+
+\subsection{Sistema de Tipos de Archivo}
+
+El protocolo utiliza un sistema de enumeración (\texttt{enum}) para los tipos de archivo, con el fin de asegurar que tanto el cliente como el servidor estén de acuerdo en la categorización de los datos:
+
+\begin{lstlisting}[language=Go]
+	type FileType int
+	
+	const (
+	FileTypeTransactions      FileType = 0  // Datos de transacciones
+	FileTypeTransactionItems  FileType = 1  // Detalles de los ítems de transacción
+	FileTypeStores            FileType = 2  // Información de tiendas
+	FileTypeMenuItems         FileType = 3  // Catálogo de ítems del menú
+	FileTypeUsers             FileType = 4  // Información de usuarios
+	)
+\end{lstlisting}
+
+\subsection*{Estructura de Directorios}
+
+El cliente espera la siguiente estructura de directorios bajo \texttt{/data}:
+
+\begin{lstlisting}
+	/data/
+	├── transactions/         → FileType 0 (FileTypeTransactions)
+	│   ├── file1.csv
+	│   └── file2.csv
+	├── transaction_items/    → FileType 1 (FileTypeTransactionItems)
+	│   ├── file1.csv
+	│   └── file2.csv
+	├── stores/               → FileType 2 (FileTypeStores)
+	│   ├── file1.csv
+	│   └── file2.csv
+	├── menu_items/           → FileType 3 (FileTypeMenuItems)
+	│   ├── file1.csv
+	│   └── file2.csv
+	└── users/                → FileType 4 (FileTypeUsers)
+	├── file1.csv
+	└── file2.csv
+\end{lstlisting}
+
+\section{Tipos de Mensaje}
+
+Todos los mensajes comienzan con un byte identificador del tipo de mensaje:
+
+\begin{longtable}{|l|c|c|p{7cm}|}
+	\hline
+	\textbf{Tipo de Mensaje} & \textbf{Valor} & \textbf{Dirección} & \textbf{Descripción} \\
+	\hline
+	MessageTypeBatch & 0x01 & Cliente → Servidor & Lote de datos CSV \\
+	\hline
+	MessageTypeEOF & 0x02 & Cliente → Servidor & Fin de un tipo de archivo \\
+	\hline
+	MessageTypeFinalEOF & 0x03 & Cliente → Servidor & Todos los datos transferidos \\
+	\hline
+	MessageTypeACK & 0x04 & Servidor → Cliente & Confirmación de recepción (ACK) \\
+	\hline
+	MessageTypeResultChunk & 0x05 & Servidor → Cliente & Fragmento de datos de resultado \\
+	\hline
+	MessageTypeResultEOF & 0x06 & Servidor → Cliente & Fin del resultado \\
+	\hline
+\end{longtable}
+
+\section{Formatos de Mensaje}
+
+\subsection{Batch Message (0x01)}
+
+Transfiere un lote de datos CSV con metadatos.
+
+\textbf{Formato:}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize,breaklines=true]
+	┌─────────┬──────────┬──────────┬─────────────┬─────────────┬──────────┬─────────┐
+	│ Tipo    │ Size   │ TipoArchivo │ ChunkActual │ TotalChunks │ NumFilas │ Payload │
+	│ (1 byte)│ (4 bytes)│ (1 byte)   │ (4 bytes)   │ (4 bytes)   │ (4 bytes)│ Variable │
+	└─────────┴──────────┴──────────┴─────────────┴─────────────┴──────────┴─────────┘
+\end{lstlisting}
+
+\textbf{Campos:}
+\begin{itemize}
+	\item \textbf{Tipo}: 0x01
+	\item \textbf{Tamaño de Marco (Frame Size)}: Tamaño total del marco (excluyendo el byte de tipo) — \textit{uint32 Big Endian}
+	\item \textbf{TipoArchivo}: Valor del tipo de archivo (0–4) — 1 byte
+	\item \textbf{ChunkActual}: Número del fragmento actual (indexado desde 1) — \textit{uint32 Big Endian}
+	\item \textbf{TotalChunks}: Número total de fragmentos — \textit{uint32 Big Endian}
+	\item \textbf{NumFilas}: Número de filas CSV en este fragmento — \textit{uint32 Big Endian}
+	\item \textbf{Payload}: Filas CSV separadas por saltos de línea — longitud variable
+\end{itemize}
+
+\subsection{Mensaje EOF (0x02)}
+
+Indica la finalización de todos los archivos para un tipo de archivo específico.
+
+\textbf{Campos:}
+\begin{itemize}
+	\item \textbf{Tipo}: 0x02
+	\item \textbf{TipoArchivo}: Valor del tipo de archivo (0–4)
+\end{itemize}
+
+\subsection{Mensaje Final EOF (0x03)}
+
+Indica que la transferencia de todos los datos ha finalizado para todos los tipos de archivo.
+
+\subsection{Mensaje ACK (0x04)}
+
+Confirma la recepción exitosa de un mensaje.
+
+\subsection{Mensaje de resultado parcial (0x05)}
+
+Transfiere un fragmento de datos de resultado desde el servidor hacia el cliente.
+
+\textbf{Campos:}
+\begin{itemize}
+	\item \textbf{Tipo}: 0x05
+	\item \textbf{QueueID}: Identificador de cola de resultados (1–4) — \textit{uint32 Big Endian}
+	\item \textbf{ChunkActual}: Número de fragmento actual — \textit{uint32 Big Endian}
+	\item \textbf{TotalChunks}: Número total de fragmentos para este resultado — \textit{uint32 Big Endian}
+	\item \textbf{DataLen}: Longitud de los datos — \textit{uint32 Big Endian}
+	\item \textbf{Data}: Datos binarios del resultado — longitud variable
+\end{itemize}
+
+\subsection{Mensaje Result EOF (0x06)}
+
+Indica el final de los resultados provenientes de una cola específica.
+
+\textbf{Campos:}
+\begin{itemize}
+	\item \textbf{Tipo}: 0x06
+	\item \textbf{QueueID}: Identificador de cola de resultados — \textit{uint32 Big Endian}
+\end{itemize}
+
+\subsection{Implementación multicliente}
+
+\paragraph{Para la implementación de soporte de multiples clientes en simultaneo, se hicieron modificaciones a los mensajes que envia el cliente al request\_handler. Todo mensaje de datos enviado (es decir, contenido de un archivo csv), contiene un header delimitado por un caracter newline. Este header de una sola columna informa el ID de cliente que envia el mensaje.}
+
+\paragraph{Luego, la comunicación interna del sistema propaga este header de principio a fin, de esta forma, todo tipo de worker al recibir un mensaje analiza el cliente de origen para el mensaje, y lo almacena o procesa de forma acorde.}
+
+\paragraph{Finalmente, el response\_builder interpreta también los resultados específicos de cada cliente y los deriva a la cola de resultados correspondiente, el request\_handler, los consume, y mediante la conexión TCP establecida en el inicio envia los resultados, tal y como se hacia con la implementación de un único cliente.}
 \end{document}
