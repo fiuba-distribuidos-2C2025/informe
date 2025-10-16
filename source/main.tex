@@ -288,7 +288,7 @@ El cliente espera la siguiente estructura de directorios bajo \texttt{/data}:
 	└── file2.csv
 \end{lstlisting}
 
-\section{Tipos de Mensaje}
+\subsection{Tipos de Mensaje}
 
 Todos los mensajes comienzan con un byte identificador del tipo de mensaje:
 
@@ -310,9 +310,9 @@ Todos los mensajes comienzan con un byte identificador del tipo de mensaje:
 	\hline
 \end{longtable}
 
-\section{Formatos de Mensaje}
+\subsection{Formatos de Mensaje}
 
-\subsection{Batch Message (0x01)}
+\subsubsection{Batch Message (0x01)}
 
 Transfiere un lote de datos CSV con metadatos.
 
@@ -335,7 +335,7 @@ Transfiere un lote de datos CSV con metadatos.
 	\item \textbf{Payload}: Filas CSV separadas por saltos de línea — longitud variable
 \end{itemize}
 
-\subsection{Mensaje EOF (0x02)}
+\subsubsection{Mensaje EOF (0x02)}
 
 Indica la finalización de todos los archivos para un tipo de archivo específico.
 
@@ -345,15 +345,15 @@ Indica la finalización de todos los archivos para un tipo de archivo específic
 	\item \textbf{TipoArchivo}: Valor del tipo de archivo (0–4)
 \end{itemize}
 
-\subsection{Mensaje Final EOF (0x03)}
+\subsubsection{Mensaje Final EOF (0x03)}
 
 Indica que la transferencia de todos los datos ha finalizado para todos los tipos de archivo.
 
-\subsection{Mensaje ACK (0x04)}
+\subsubsection{Mensaje ACK (0x04)}
 
 Confirma la recepción exitosa de un mensaje.
 
-\subsection{Mensaje de resultado parcial (0x05)}
+\subsubsection{Mensaje de resultado parcial (0x05)}
 
 Transfiere un fragmento de datos de resultado desde el servidor hacia el cliente.
 
@@ -367,7 +367,7 @@ Transfiere un fragmento de datos de resultado desde el servidor hacia el cliente
 	\item \textbf{Data}: Datos binarios del resultado — longitud variable
 \end{itemize}
 
-\subsection{Mensaje Result EOF (0x06)}
+\subsubsection{Mensaje Result EOF (0x06)}
 
 Indica el final de los resultados provenientes de una cola específica.
 
