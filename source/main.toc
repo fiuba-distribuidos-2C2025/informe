@@ -12,31 +12,32 @@
 \contentsline {subsubsection}{\numberline {2.2.1}DAG}{6}{subsubsection.2.2.1}%
 \contentsline {subsection}{\numberline {2.3}Vista de Desarrollo}{6}{subsection.2.3}%
 \contentsline {subsubsection}{\numberline {2.3.1}Diagrama de Paquetes}{6}{subsubsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.4}Vista de Procesos}{9}{subsection.2.4}%
-\contentsline {paragraph}{Se representa la interacción entre los componentes del sistema, su forma de comunicación de principio a fin. Es posible visualizar la concurrencia del sistema, asi como también la escalabilidad y distribuición de tareas.}{9}{section*.10}%
-\contentsline {subsubsection}{\numberline {2.4.1}Diagrama de Actividad}{9}{subsubsection.2.4.1}%
-\contentsline {paragraph}{En el siguiente diagrama se muestra parcialmente el proceso de obtener los productos más vendidos y que más ganancias han generado, para cada mes, en este caso se representa solamente la parte de mayor complejidad de obtención, la de mayor valor y no solo mayor cantidad de ventas.}{9}{section*.11}%
-\contentsline {paragraph}{*Se considera más complejo debido a que los pasos necesarios para obtener este dato es superior a la de calcular el producto más vendido en cantidad.}{10}{section*.12}%
-\contentsline {paragraph}{El proceso que observamos en el diagrama comienza con los groupers, en este caso estos tomaran la data de diferentes colas de entrada donde tienen transacciones e iran sumando los valores correspondiente a un item del menu en un mismo año y mes, para luego enviar sus resultados a la cola de salida para que el aggregator los pueda procesar}{10}{section*.13}%
-\contentsline {paragraph}{El aggregator se encargara de recibir todos los resultados parciales de los groupers y sumarlos en un solo resultado final para cada año-mes. Este sera enviado a la cola de salida para que el joiner del menu de items pueda agregar el nombre del item a los resultados}{10}{section*.14}%
-\contentsline {paragraph}{El joiner del menu de items en un principio espera a obtener los datos del dataset de menu items ya que sin estos no podra realizar el join, una vez los tiene se queda esperando por el resultado del aggregator. Une vez recibidos los resultados finales del aggregator y realizar el join con los datos correctos envia dicha fila de resultado a la cola de resultados que va a ser leida por el response builder }{10}{section*.15}%
-\contentsline {paragraph}{Manejo de EOF:}{11}{section*.16}%
-\contentsline {paragraph}{Este proceso se da como en una especie de cascada. En primer lugar el cliente enviara datos indicando que tipo de dataset esta enviando \(transactions, menu_items, etc.\) mandando un EOF cuando ya envio todos los datos relacionados a un tipo especifico. El request handler detectara este mensaje de EOF y encolara un nuevo mensaje EOF en las colas de salida correspondientes. Asi se dara el proceso donde cada vez que un worker lee un mensaje de EOF debe propagarlo hacia la cola de salida sea cual sea, asi se asegura de que el proximo worker tambien lo recibe. Una vez llega al ultimo worker de la query este encola el resultado final indicando tambien que ha terminado de procesar todos los datos. El response builder espera a recibir todos los EOFs de todos los workers de salida para saber que ya tiene la totalidad de la respuesta para la query entonces puede procesarla y enviarla al request handler.}{11}{section*.17}%
-\contentsline {subsubsection}{\numberline {2.4.2}Diagrama de Secuencia}{11}{subsubsection.2.4.2}%
-\contentsline {paragraph}{Podemos ver como el cliente desde la terminal inicializa el programa, el cual establece conexión con el sistema mediante el Request Handler. La comunicación entre ellos consistira en enviar todos los datos necesarios en bucle, cada mensaje transmitido por el cliente incluye un header informando el tipo de archivo transmitido, el tamaño del payload, y un bit que indica si hay datos pendientes por transmitir posteriores a ese mensaje. Una vez que ya no haya nada más que enviar, el Middleware le enviará el programa el resultado final, el cual sera mostrado por terminal al usuario.}{12}{section*.18}%
-\contentsline {section}{\numberline {3}Comunicacion}{12}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Vista general}{12}{subsection.3.1}%
-\contentsline {paragraph}{Se describe el protocolo de comunicación utilizado entre el client y request_handler para la transferencia de archivos CSV y la obtención de resultados. El protocolo utiliza framing de tipo TLV (type-lenght-value) para prevenir short reads/writes.}{12}{section*.19}%
-\contentsline {subsection}{\numberline {3.2}Sistema de Tipos de Archivo}{12}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Tipos de Mensaje}{12}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Formatos de Mensaje}{13}{subsection.3.4}%
-\contentsline {subsubsection}{\numberline {3.4.1}Batch Message (0x01)}{13}{subsubsection.3.4.1}%
-\contentsline {subsubsection}{\numberline {3.4.2}Mensaje EOF (0x02)}{13}{subsubsection.3.4.2}%
-\contentsline {subsubsection}{\numberline {3.4.3}Mensaje Final EOF (0x03)}{13}{subsubsection.3.4.3}%
-\contentsline {subsubsection}{\numberline {3.4.4}Mensaje ACK (0x04)}{13}{subsubsection.3.4.4}%
-\contentsline {subsubsection}{\numberline {3.4.5}Mensaje de resultado parcial (0x05)}{13}{subsubsection.3.4.5}%
-\contentsline {subsubsection}{\numberline {3.4.6}Mensaje Result EOF (0x06)}{13}{subsubsection.3.4.6}%
-\contentsline {subsection}{\numberline {3.5}Implementación multicliente}{14}{subsection.3.5}%
-\contentsline {paragraph}{Para la implementación de soporte de multiples clientes en simultaneo, se hicieron modificaciones a los mensajes que envia el cliente al request\_handler. Todo mensaje de datos enviado (es decir, contenido de un archivo csv), contiene un header delimitado por un caracter newline. Este header de una sola columna informa el ID de cliente que envia el mensaje.}{14}{section*.21}%
-\contentsline {paragraph}{Luego, la comunicación interna del sistema propaga este header de principio a fin, de esta forma, todo tipo de worker al recibir un mensaje analiza el cliente de origen para el mensaje, y lo almacena o procesa de forma acorde.}{14}{section*.22}%
-\contentsline {paragraph}{Finalmente, el response\_builder interpreta también los resultados específicos de cada cliente y los deriva a la cola de resultados correspondiente, el request\_handler, los consume, y mediante la conexión TCP establecida en el inicio envia los resultados, tal y como se hacia con la implementación de un único cliente.}{14}{section*.23}%
+\contentsline {subsection}{\numberline {2.4}Vista de Procesos}{10}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Diagrama de Actividad}{10}{subsubsection.2.4.1}%
+\contentsline {paragraph}{Manejo de EOF:}{11}{section*.10}%
+\contentsline {subsubsection}{\numberline {2.4.2}Diagrama de Secuencia}{12}{subsubsection.2.4.2}%
+\contentsline {section}{\numberline {3}Comunicacion}{13}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Vista general}{13}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Sistema de Tipos de Archivo}{13}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Tipos de Mensaje}{13}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Formatos de Mensaje}{14}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Batch Message (0x01)}{14}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Mensaje EOF (0x02)}{14}{subsubsection.3.4.2}%
+\contentsline {subsubsection}{\numberline {3.4.3}Mensaje Final EOF (0x03)}{14}{subsubsection.3.4.3}%
+\contentsline {subsubsection}{\numberline {3.4.4}Mensaje ACK (0x04)}{14}{subsubsection.3.4.4}%
+\contentsline {subsubsection}{\numberline {3.4.5}Mensaje de resultado parcial (0x05)}{14}{subsubsection.3.4.5}%
+\contentsline {subsubsection}{\numberline {3.4.6}Mensaje Result EOF (0x06)}{15}{subsubsection.3.4.6}%
+\contentsline {subsubsection}{\numberline {3.4.7}Mensaje Query ID (0x07)}{15}{subsubsection.3.4.7}%
+\contentsline {subsubsection}{\numberline {3.4.8}Mensaje Query Request (0x08)}{15}{subsubsection.3.4.8}%
+\contentsline {subsubsection}{\numberline {3.4.9}Mensaje Results Request (0x09)}{15}{subsubsection.3.4.9}%
+\contentsline {subsubsection}{\numberline {3.4.10}Mensaje Results Pending (0x0A)}{15}{subsubsection.3.4.10}%
+\contentsline {subsubsection}{\numberline {3.4.11}Mensaje Results Ready (0x0B)}{15}{subsubsection.3.4.11}%
+\contentsline {subsubsection}{\numberline {3.4.12}Mensaje Resume Request (0x0C)}{15}{subsubsection.3.4.12}%
+\contentsline {subsubsection}{\numberline {3.4.13}Mensaje Health Check (0x0D)}{15}{subsubsection.3.4.13}%
+\contentsline {subsection}{\numberline {3.5}Implementación multicliente}{15}{subsection.3.5}%
+\contentsline {section}{\numberline {4}Tolerancia a Fallos}{16}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Caidas de diferentes nodos}{16}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}Persistencia de datos}{16}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}Watcher}{16}{subsubsection.4.1.2}%
+\contentsline {subsubsection}{\numberline {4.1.3}Reanudación de envíos desde el cliente}{16}{subsubsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.2}Mensajes duplicados}{17}{subsection.4.2}%
